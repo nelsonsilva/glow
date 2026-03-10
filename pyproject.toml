@@ -1,0 +1,35 @@
+[project]
+name = "glow"
+version = "0.1.0"
+description = "LED Matrix Display Abstraction Layer"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pillow>=10.0.0",
+    "numpy>=1.26.0",
+]
+
+[project.optional-dependencies]
+pi4 = ["rgbmatrix"]
+pi5 = ["adafruit-blinka-raspberry-pi5-piomatter>=1.0.0"]
+emulator = ["RGBMatrixEmulator>=0.13.0"]
+dev = ["pytest>=8.0.0", "mypy>=1.8.0", "ruff>=0.2.0"]
+
+[project.scripts]
+glow = "glow.main:main"
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.uv.sources]
+rgbmatrix = { git = "https://github.com/hzeller/rpi-rgb-led-matrix" }
