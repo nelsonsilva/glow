@@ -145,11 +145,17 @@ glow/
 ├── visualizations/
 │   ├── __init__.py          # Registry mapping viz names → functions + params
 │   ├── arkanoid.py          # Block breaker game
+│   ├── calendar.py          # Google Calendar agenda
 │   ├── conway.py            # Conway's Game of Life
+│   ├── fire.py              # Demoscene fire effect
+│   ├── matrix.py            # Matrix rain (falling characters)
 │   ├── news.py              # RSS news ticker
 │   ├── plasma.py            # Plasma effect
 │   ├── spotify.py           # Spotify now-playing
 │   ├── text.py              # Scrolling text (reference viz with PARAMS)
 │   └── utils.py             # Shared helpers (fonts, images)
+├── gcal/
+│   ├── __init__.py          # Package exports
+│   └── client.py            # Google Calendar OAuth2 API client
 └── main.py                  # Example usage
 ```
