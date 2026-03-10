@@ -54,14 +54,14 @@ Configuration via environment variables:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `DISPLAY_BACKEND` | `auto` | Backend: `piomatter`, `rgbmatrix`, `emulator`, or `auto` |
-| `DISPLAY_WIDTH` | `64` | Display width in pixels |
-| `DISPLAY_HEIGHT` | `32` | Display height in pixels |
+| `DISPLAY_WIDTH` | `192` | Display width in pixels |
+| `DISPLAY_HEIGHT` | `64` | Display height in pixels |
 | `DISPLAY_CHAIN_LENGTH` | `1` | Number of chained panels |
-| `DISPLAY_PARALLEL` | `1` | Number of parallel chains |
+| `DISPLAY_PARALLEL` | `3` | Number of parallel chains |
 | `DISPLAY_LAYOUT` | `horizontal` | Panel layout: `horizontal` (side-by-side) or `vertical` (stacked) |
-| `DISPLAY_HARDWARE_MAPPING` | `adafruit-hat` | Hardware mapping (e.g. `regular`, `adafruit-hat`) |
+| `DISPLAY_HARDWARE_MAPPING` | `regular` | Hardware mapping (e.g. `regular`, `adafruit-hat`) |
 | `DISPLAY_GPIO_SLOWDOWN` | `1` | GPIO slowdown factor (increase for Pi Zero 2 W) |
-| `DISPLAY_DISABLE_HW_PULSING` | `false` | Disable hardware pulsing (`true`/`false`) |
+| `DISPLAY_DISABLE_HW_PULSING` | `true` | Disable hardware pulsing (`true`/`false`) |
 
 ## Running
 

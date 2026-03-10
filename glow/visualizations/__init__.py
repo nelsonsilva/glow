@@ -1,6 +1,7 @@
 """Visualization effects for the LED matrix display."""
 
+from glow.visualizations.arkanoid import arkanoid
 from glow.visualizations.conway import conway
 from glow.visualizations.plasma import plasma
 
-__all__ = ["conway", "plasma"]
+__all__ = ["arkanoid", "conway", "plasma"]
