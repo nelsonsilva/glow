@@ -5,9 +5,6 @@ import hashlib
 import random
 import time
 from datetime import datetime
-from io import BytesIO
-from pathlib import Path
-from urllib.request import urlopen
 
 import feedparser
 from bs4 import BeautifulSoup
@@ -15,9 +12,14 @@ from PIL import Image, ImageDraw, ImageFont
 from unidecode import unidecode
 
 from glow.display import create_display
+from glow.visualizations.utils import (
+    ASSETS_DIR,
+    FONTS_DIR,
+    center_text_offset,
+    fetch_image,
+    resize_icon,
+)
 
-ASSETS_DIR = Path(__file__).parent.parent / "assets"
-FONTS_DIR = ASSETS_DIR / "fonts"
 NEWS_DIR = ASSETS_DIR / "news"
 
 FEEDS: list[dict[str, str]] = [
@@ -74,35 +76,6 @@ FEEDS: list[dict[str, str]] = [
 ]
 
 
-def _resize_icon(
-    icon: Image.Image,
-    max_height: int | None = None,
-    max_width: int | None = None,
-) -> Image.Image:
-    """Resize icon to fit max_height or max_width, preserving aspect ratio."""
-    icon_width, icon_height = icon.size
-    if max_height:
-        icon_width = int(icon_width / (icon_height / max_height))
-        icon_height = max_height
-    elif max_width:
-        icon_height = int(icon_height / (icon_width / max_width))
-        icon_width = max_width
-    return icon.resize((icon_width, icon_height), Image.Resampling.LANCZOS)
-
-
-def _center_text_offset(text: str, font: ImageFont.ImageFont, available_width: int) -> int:
-    """Compute x-offset to center text within available_width."""
-    _, _, text_width, _ = font.getbbox(text)
-    if text_width < available_width:
-        return int((available_width - text_width) / 2)
-    return 0
-
-
-def _fetch_image(url: str) -> Image.Image:
-    """Download an image from a URL and return as RGB PIL Image."""
-    return Image.open(BytesIO(urlopen(url).read())).convert("RGB")
-
-
 class FeedWrapper:
     """Manages iteration through RSS feed entries with scrolling state."""
 
@@ -157,7 +130,7 @@ def _prefetch_thumbnails(feed) -> dict[str, Image.Image]:
     for entry in feed.entries:
         try:
             thumb_url = entry.media_thumbnail[0]["url"]
-            thumbnails[entry.id] = _fetch_image(thumb_url)
+            thumbnails[entry.id] = fetch_image(thumb_url)
         except (AttributeError, KeyError, Exception):
             pass
     return thumbnails
@@ -220,7 +193,7 @@ def news(duration: float = 120.0) -> None:
 
     # Pre-load and resize the source logo once
     logo = Image.open(NEWS_DIR / feed_def["logo"]).convert("RGB")
-    resized_logo = _resize_icon(logo, max_height=30)
+    resized_logo = resize_icon(logo, max_height=30)
 
     # Reusable frame buffer — avoids allocating a new Image every frame
     frame = Image.new("RGB", (width, height), color=(0, 0, 0))
@@ -247,7 +220,7 @@ def news(duration: float = 120.0) -> None:
 
             # Article thumbnail (left side) — use pre-fetched image
             if entry.id in thumbnails:
-                resized_thumb = _resize_icon(thumbnails[entry.id], max_height=50)
+                resized_thumb = resize_icon(thumbnails[entry.id], max_height=50)
                 img.paste(resized_thumb, (0, 0))
                 thumb_size = resized_thumb.size
             else:
@@ -262,7 +235,7 @@ def news(duration: float = 120.0) -> None:
             # Date text centered between thumbnail and logo
             available_text_width = width - resized_logo.size[0] - thumb_size[0]
             date_text = datetime.now().strftime("%m/%d/%y")
-            xoffset = thumb_size[0] + _center_text_offset(date_text, font5, available_text_width)
+            xoffset = thumb_size[0] + center_text_offset(date_text, font5, available_text_width)
             draw.text((xoffset, 40), date_text, font=font5)
 
             # Set up horizontal scrolling for summary text
@@ -281,7 +254,7 @@ def news(duration: float = 120.0) -> None:
 
         # Time text (updates every frame)
         time_text = datetime.now().strftime("%H:%M:%S")
-        xoffset = thumb_size[0] + _center_text_offset(time_text, font, available_text_width)
+        xoffset = thumb_size[0] + center_text_offset(time_text, font, available_text_width)
         draw.text((xoffset, 15), time_text, font=font)
 
         # Scrolling summary text
