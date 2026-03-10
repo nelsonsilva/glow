@@ -1,10 +1,13 @@
 import math
+import threading
 import time
 from PIL import Image
 from glow.display import create_display
 
+PARAMS: dict = {}
 
-def plasma(duration: float = 10.0) -> None:
+
+def plasma(duration: float = 10.0, stop_event: threading.Event | None = None) -> None:
     """Run plasma effect for specified duration."""
     display = create_display()
     width, height = display.width, display.height
@@ -18,7 +21,7 @@ def plasma(duration: float = 10.0) -> None:
         palette.append((r, g, b))
 
     start = time.time()
-    while time.time() - start < duration:
+    while time.time() - start < duration and not (stop_event and stop_event.is_set()):
         t = time.time() * 2  # Time factor for animation
 
         canvas = Image.new("RGB", (width, height))

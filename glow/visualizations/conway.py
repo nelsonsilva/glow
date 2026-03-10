@@ -1,10 +1,13 @@
 import random
+import threading
 import time
 
 import numpy as np
 from PIL import Image
 
 from glow.display import create_display
+
+PARAMS: dict = {}
 
 ON = 255
 OFF = 0
@@ -111,7 +114,7 @@ def _run_step(grid: np.ndarray) -> np.ndarray:
     return new_grid
 
 
-def conway(duration: float = 30.0) -> None:
+def conway(duration: float = 30.0, stop_event: threading.Event | None = None) -> None:
     """Run Conway's Game of Life with generation trail effect."""
     display = create_display()
     width, height = display.width, display.height
@@ -123,7 +126,7 @@ def conway(duration: float = 30.0) -> None:
     generations: list[np.ndarray] = [grid]
 
     start = time.time()
-    while time.time() - start < duration:
+    while time.time() - start < duration and not (stop_event and stop_event.is_set()):
         # Build RGB frame as numpy array, then convert to PIL image
         frame = np.zeros((height, width, 3), dtype=np.uint8)
 

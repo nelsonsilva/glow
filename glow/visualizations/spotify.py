@@ -2,6 +2,7 @@
 
 import argparse
 import datetime
+import threading
 import time
 
 from PIL import Image, ImageDraw
@@ -89,7 +90,10 @@ def _render_track_background(track_info: dict, width: int, height: int) -> Image
     return img
 
 
-def spotify(duration: float = 900.0) -> None:
+PARAMS: dict = {}
+
+
+def spotify(duration: float = 900.0, stop_event: threading.Event | None = None) -> None:
     """Display the currently playing Spotify track on the LED matrix."""
     display = create_display()
     width, height = display.width, display.height
@@ -107,7 +111,7 @@ def spotify(duration: float = 900.0) -> None:
     frame_time = 1.0 / 30.0
     deadline = time.monotonic() + duration
 
-    while time.monotonic() < deadline:
+    while time.monotonic() < deadline and not (stop_event and stop_event.is_set()):
         frame_start = time.monotonic()
 
         # Poll Spotify API at ~1s intervals

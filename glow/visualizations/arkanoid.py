@@ -2,11 +2,14 @@
 
 import random
 import curses
+import threading
 import time
 
 from PIL import Image, ImageDraw
 
 from glow.display import create_display
+
+PARAMS: dict = {}
 
 COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 0, 255)]
 FRICTION: float = 0.9
@@ -274,14 +277,14 @@ class Stage:
             self.setup_level()
 
 
-def _run_auto(duration: float) -> None:
+def _run_auto(duration: float, stop_event: threading.Event | None = None) -> None:
     """Run Arkanoid in auto-play mode."""
     display = create_display()
     stage = Stage(display.width, display.height)
     frame_time = 1.0 / 30.0
 
     end_time = time.monotonic() + duration
-    while time.monotonic() < end_time:
+    while time.monotonic() < end_time and not (stop_event and stop_event.is_set()):
         frame_start = time.monotonic()
 
         canvas = Image.new("RGB", (display.width, display.height), (0, 0, 0))
@@ -333,17 +336,22 @@ def _run_interactive(stdscr: curses.window, duration: float) -> None:
             time.sleep(frame_time - elapsed)
 
 
-def arkanoid(duration: float = 60.0, interactive: bool = False) -> None:
+def arkanoid(
+    duration: float = 60.0,
+    interactive: bool = False,
+    stop_event: threading.Event | None = None,
+) -> None:
     """Arkanoid (block breaker) visualization.
 
     Args:
         duration: How long to run in seconds.
         interactive: If True, use keyboard input (arrow keys) instead of auto-play.
+        stop_event: Optional threading event for cooperative cancellation.
     """
     if interactive:
         curses.wrapper(_run_interactive, duration)
     else:
-        _run_auto(duration)
+        _run_auto(duration, stop_event)
 
 
 if __name__ == "__main__":

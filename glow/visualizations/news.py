@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import random
+import threading
 import time
 from datetime import datetime
 
@@ -174,7 +175,10 @@ def _parse_feed(url: str, max_width: int, max_height: int, max_items: int = 6) -
     return FeedWrapper(feed, max_width, max_height)
 
 
-def news(duration: float = 120.0) -> None:
+PARAMS: dict = {}
+
+
+def news(duration: float = 120.0, stop_event: threading.Event | None = None) -> None:
     """Display scrolling RSS news articles on the LED matrix."""
     display = create_display()
     width, height = display.width, display.height
@@ -204,7 +208,7 @@ def news(duration: float = 120.0) -> None:
 
     frame_time = 1.0 / 30.0
     deadline = time.monotonic() + duration
-    while time.monotonic() < deadline:
+    while time.monotonic() < deadline and not (stop_event and stop_event.is_set()):
         frame_start = time.monotonic()
 
         img = feed.get_rendered_img()
