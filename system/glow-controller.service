@@ -1,0 +1,16 @@
+[Unit]
+Description=Glow LED Matrix Controller
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=${GLOW_USER}
+WorkingDirectory=${GLOW_DIR}
+EnvironmentFile=${GLOW_DIR}/.env
+ExecStart=${GLOW_DIR}/.venv/bin/glow-controller
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

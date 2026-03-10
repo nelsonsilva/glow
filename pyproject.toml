@@ -25,6 +25,9 @@ dev = ["pytest>=8.0.0", "mypy>=1.8.0", "ruff>=0.2.0"]
 glow = "glow.main:main"
 glow-controller = "glow.controller:main"
 
+[tool.setuptools.packages.find]
+include = ["glow*"]
+
 [tool.mypy]
 python_version = "3.12"
 warn_return_any = true
